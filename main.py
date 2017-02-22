@@ -5,9 +5,7 @@ from flask import Flask, request, render_template, redirect, url_for
 from dotenv import load_dotenv, find_dotenv
 app = Flask(__name__)
 load_dotenv(find_dotenv())
-conn = sqlite3.connect(os.environ.get('BBS_DB', './bbs.db'),
-                       detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-sqlite3.dbapi2.converters['DATETIME'] = sqlite3.dbapi2.converters['TIMESTAMP']
+conn = sqlite3.connect(os.environ.get('BBS_DB', './bbs.db'))
 conn.row_factory = sqlite3.Row
 
 
@@ -45,19 +43,17 @@ def post_thread(title: str) -> int:
     created_at = datetime.now()
 
     c = conn.execute('INSERT INTO threads (title, created_at, updated_at) '
-                     'VALUES (?, ?, ?)', (title, created_at, created_at))
+                     'VALUES (?, DATETIME("NOW"), DATETIME("NOW"))', (title,))
     thread_id = c.lastrowid
 
     return thread_id
 
 
 def create_post(thread_id: int, name: str, email: str, text: str) -> int:
-    created_at = datetime.now()
-
     c = conn.execute('INSERT INTO posts '
                      '(thread_id, name, email, text, created_at) '
-                     'VALUES (?, ?, ?, ?, ?)',
-                     (thread_id, name, email, text, created_at))
+                     'VALUES (?, ?, ?, ?, DATETIME("NOW"))',
+                     (thread_id, name, email, text,))
 
     return c.lastrowid
 # end helper functions

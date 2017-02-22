@@ -1,8 +1,8 @@
 CREATE TABLE threads (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title VARCHAR(64),
-  created_at DATE,
-  updated_at DATE
+  created_at DATETIME,
+  updated_at DATETIME
 );
 
 CREATE TABLE posts (
@@ -11,5 +11,5 @@ CREATE TABLE posts (
   name VARCHAR(32),
   email VARCHAR(128),
   text TEXT,
-  created_at DATE
+  created_at DATETIME
 );
