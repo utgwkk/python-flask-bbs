@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from datetime import datetime
+from itertools import groupby
 from flask import Flask, request, render_template, redirect, url_for, abort
 from dotenv import load_dotenv, find_dotenv
 app = Flask(__name__)
@@ -72,14 +73,15 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
 
 
 def list_threads():
-    threads = conn.execute('SELECT * FROM threads '
-                           'ORDER BY updated_at DESC').fetchall()
+    threads = [dict(x) for x in conn.execute('SELECT * FROM threads '
+                                             'ORDER BY updated_at '
+                                             'DESC').fetchall()]
+    posts_groupby = groupby(conn.execute('SELECT * FROM posts ORDER BY '
+                                         'thread_id ASC').fetchall(),
+                            key=lambda x: x['thread_id'])
+    posts = {k: list(v) for k, v in posts_groupby}
     for i, thread in enumerate(threads):
-        threads[i] = dict(threads[i])
-        threads[i]['posts'] = conn.execute('SELECT * FROM posts '
-                                           'WHERE thread_id = ? '
-                                           'ORDER BY created_at ASC LIMIT 5',
-                                           (thread['id'],)).fetchall()
+        threads[i]['posts'] = list(posts[thread['id']])
     return threads
 
 
