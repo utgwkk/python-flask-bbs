@@ -72,7 +72,8 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
 
 
 def list_threads():
-    threads = conn.execute('SELECT * FROM threads ORDER BY updated_at DESC').fetchall()
+    threads = conn.execute('SELECT * FROM threads '
+                           'ORDER BY updated_at DESC').fetchall()
     for i, thread in enumerate(threads):
         threads[i] = dict(threads[i])
         threads[i]['posts'] = conn.execute('SELECT * FROM posts '
