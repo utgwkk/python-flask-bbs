@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__)
 
@@ -15,4 +16,4 @@ def create_thread():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=os.environ.get('BBS_PORT', 8080))
