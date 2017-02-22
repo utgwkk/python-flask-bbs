@@ -6,5 +6,12 @@
   </head>
   <body>
     <h1>Flask BBS</h1>
+    <hr>
+    <h2>threads</h2>
+    {% for thread in threads %}
+      <div>
+        <h3><a href="/threads/{{ thread['id'] }}">{{ thread['title'] }}</a></h3>
+      </div>
+    {% endfor %}
   </body>
 </html>

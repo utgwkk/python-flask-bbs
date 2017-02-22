@@ -56,12 +56,17 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
                      (thread_id, name, email, text,))
 
     return c.lastrowid
+
+
+def list_threads():
+    threads = conn.execute('SELECT * FROM threads ORDER BY updated_at DESC').fetchall()
+    return threads
 # end helper functions
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', threads=list_threads())
 
 
 @app.route('/threads/create', methods=['GET', 'POST'])
