@@ -65,6 +65,7 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
                      '(thread_id, name, email, text, created_at) '
                      'VALUES (?, ?, ?, ?, DATETIME("NOW"))',
                      (thread_id, name, email, text,))
+    update_thread_timestamp(thread_id)
 
     return c.lastrowid
 
@@ -88,6 +89,11 @@ def get_posts(thread_id):
 def get_title(thread_id):
     return conn.execute('SELECT title FROM threads WHERE id = ?',
                         (thread_id,)).fetchone()['title']
+
+
+def update_thread_timestamp(thread_id):
+    conn.execute('UPDATE threads SET updated_at = DATETIME("NOW") '
+                 'WHERE id = ?', (thread_id,))
 # end helper functions
 
 
