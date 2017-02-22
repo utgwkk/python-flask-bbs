@@ -6,6 +6,7 @@
   </head>
   <body>
     <h1>Flask BBS</h1>
+    <a href="{{ url_for('create_thread') }}">Create a thread</a>
     <hr>
     <h2>threads</h2>
     {% for thread in threads %}
