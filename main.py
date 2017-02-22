@@ -28,16 +28,16 @@ class ThreadDoesNotExist(Exception):
 # helper functions
 def validate_thread(title: str) -> None:
     if len(title) <= 0 or len(title) > MAX_LENGTH['title']:
-        raise ValidationError('`title` must not be empty or longer than '
+        raise ValidationError('`Subject` must not be empty or longer than '
                               '{} characters.'.format(MAX_LENGTH['title']))
 
 
 def validate_post(name: str, email: str, text: str) -> None:
     if len(name) <= 0 or len(name) > MAX_LENGTH['name']:
-        raise ValidationError('`name` must not be empty or longer than '
+        raise ValidationError('`Name` must not be empty or longer than '
                               '{} characters.'.format(MAX_LENGTH['name']))
     if len(email) > MAX_LENGTH['email']:
-        raise ValidationError('`email` must not be empty or longer than '
+        raise ValidationError('`E-mail` must not be longer than '
                               '{} characters.'.format(MAX_LENGTH['email']))
 
 
