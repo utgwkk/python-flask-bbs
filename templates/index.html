@@ -11,7 +11,7 @@
     <h2>threads</h2>
     {% for thread in threads %}
       <div>
-        <h3><a href="/threads/{{ thread['id'] }}">{{ thread['title'] }}</a></h3>
+        <h3><a href="{{ url_for('show_thread', thread_id=thread['id']) }}">{{ thread['title'] }}</a></h3>
         {% for post in thread['posts'] %}
         <div>
           Name:
