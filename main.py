@@ -1,5 +1,9 @@
 import os
+import re
 import sqlite3
+from crypt import crypt
+from hashlib import sha1
+from base64 import b64encode
 from datetime import datetime
 from itertools import groupby
 from flask import Flask, request, render_template, redirect, url_for, abort
@@ -98,6 +102,31 @@ def get_title(thread_id):
 def update_thread_timestamp(thread_id):
     conn.execute('UPDATE threads SET updated_at = DATETIME("NOW") '
                  'WHERE id = ?', (thread_id,))
+
+
+def generate_trip(tripstr: str) -> str:
+    if len(tripstr) >= 12:
+        mark = tripstr[0]
+        if mark == '#' or mark == '$':
+            m = re.match(r'^#([0-9a-fA-F]{16})([\./0-9A-Za-z]{0,2})$', tripstr)
+            if m:
+                trip = crypt(str(int(m.group(1))), m.group(2) + '..')[-10:]
+            else:
+                trip = '???'
+        else:
+            m = sha1()
+            m.update(tripstr.encode('utf-8'))
+            trip = str(b64encode(m.hexdigest))[:12]
+            trip = trip.replace('+', '.')
+    else:
+        tripkey = tripstr[1:]
+        salt = (tripkey + "H.")[1:3]
+        salt = re.sub(r'[^\.-z]', '.', salt)
+        salt = salt.translate(str.maketrans(':;<=>?@[\\]^_`', 'ABCDEFGabcdef'))
+        trip = crypt(tripkey.encode('utf-8').decode('cp932'), salt)
+        trip = trip[-10:]
+    trip = '◆' + trip
+    return trip
 # end helper functions
 
 
