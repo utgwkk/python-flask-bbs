@@ -67,6 +67,16 @@ def list_threads():
                                            'ORDER BY created_at ASC LIMIT 5',
                                            (thread['id'],)).fetchall()
     return threads
+
+
+def get_posts(thread_id):
+    return conn.execute('SELECT * FROM posts WHERE thread_id = ? '
+                        'ORDER BY created_at ASC', (thread_id,)).fetchall()
+
+
+def get_title(thread_id):
+    return conn.execute('SELECT title FROM threads WHERE id = ?',
+                        (thread_id,)).fetchone()['title']
 # end helper functions
 
 
@@ -99,6 +109,12 @@ def create_thread():
                     return redirect(url_for('index'))
             except sqlite3.IntegrityError:
                 return redirect(url_for('index'))
+
+
+@app.route('/threads/<int:thread_id>', methods=['GET'])
+def show_thread(thread_id):
+    return render_template('show_thread.html', posts=get_posts(thread_id),
+                           title=get_title(thread_id))
 
 
 if __name__ == '__main__':
