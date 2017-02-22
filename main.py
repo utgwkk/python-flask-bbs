@@ -106,7 +106,8 @@ def create_thread():
                 with conn:
                     thread_id = post_thread(title)
                     create_post(thread_id, name, email, text)
-                    return redirect(url_for('index'))
+                    return redirect(url_for('show_thread',
+                                            thread_id=thread_id))
             except sqlite3.IntegrityError:
                 return redirect(url_for('index'))
 
