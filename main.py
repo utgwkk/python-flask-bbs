@@ -65,7 +65,8 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
                      '(thread_id, name, email, text, created_at) '
                      'VALUES (?, ?, ?, ?, DATETIME("NOW"))',
                      (thread_id, name, email, text,))
-    update_thread_timestamp(thread_id)
+    if email != 'sage':
+        update_thread_timestamp(thread_id)
 
     return c.lastrowid
 
