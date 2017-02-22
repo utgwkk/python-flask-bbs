@@ -60,6 +60,12 @@ def create_post(thread_id: int, name: str, email: str, text: str) -> int:
 
 def list_threads():
     threads = conn.execute('SELECT * FROM threads ORDER BY updated_at DESC').fetchall()
+    for i, thread in enumerate(threads):
+        threads[i] = dict(threads[i])
+        threads[i]['posts'] = conn.execute('SELECT * FROM posts '
+                                           'WHERE thread_id = ? '
+                                           'ORDER BY created_at ASC LIMIT 5',
+                                           (thread['id'],)).fetchall()
     return threads
 # end helper functions
 

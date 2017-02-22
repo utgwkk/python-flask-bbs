@@ -11,6 +11,20 @@
     {% for thread in threads %}
       <div>
         <h3><a href="/threads/{{ thread['id'] }}">{{ thread['title'] }}</a></h3>
+        {% for post in thread['posts'] %}
+        <div>
+          Name:
+          {% if post['email'] %}
+            <a href="mailto:{{ post['email'] }}">{{ post['name'] }}</a>
+          {% else %}
+            {{ post['name'] }}
+          {% endif %}
+          {{ post['created_at'] }}
+        </div>
+        <p>
+          {{ post['text'] }}
+        </p>
+        {% endfor %}
       </div>
     {% endfor %}
   </body>
