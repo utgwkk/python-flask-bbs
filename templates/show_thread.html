@@ -22,5 +22,22 @@
       {{ post['text'] }}
     </p>
     {% endfor %}
+    <hr>
+    <form action="{{ url_for('post_to_thread', thread_id=thread_id) }}" method="POST">
+      <p>
+        <label for="name">Name</label>
+        <input type="text" name="name" maxlength="{{ max_length['name'] }}">
+        <label for="email">E-mail</label>
+        <input type="text" name="email" size="32" maxlength="{{ max_length['email'] }}">
+      </p>
+      <p>
+        <label for="text">Comment</label>
+        <textarea name="text" cols="64" rows="8"></textarea>
+      </p>
+      <p>
+      <input type="submit" value="Post">
+      <input type="reset" value="Reset">
+      </p>
+    </form>
   </body>
 </html>

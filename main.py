@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from datetime import datetime
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort
 from dotenv import load_dotenv, find_dotenv
 app = Flask(__name__)
 load_dotenv(find_dotenv())
@@ -20,6 +20,10 @@ class ValidationError(Exception):
     pass
 
 
+class ThreadDoesNotExist(Exception):
+    pass
+
+
 # helper functions
 def validate_thread(title: str) -> None:
     if len(title) <= 0 or len(title) > MAX_LENGTH['title']:
@@ -34,6 +38,13 @@ def validate_post(name: str, email: str, text: str) -> None:
     if len(email) > MAX_LENGTH['email']:
         raise ValidationError('`email` must not be empty or longer than '
                               '{} characters.'.format(MAX_LENGTH['email']))
+
+
+def check_thread_exists(thread_id: int) -> None:
+    count = conn.execute('SELECT COUNT(*) FROM threads '
+                         'WHERE id = ?', (thread_id,))
+    if count == 0:
+        raise ThreadDoesNotExist()
 
 
 def post_thread(title: str) -> int:
@@ -115,7 +126,29 @@ def create_thread():
 @app.route('/threads/<int:thread_id>', methods=['GET'])
 def show_thread(thread_id):
     return render_template('show_thread.html', posts=get_posts(thread_id),
-                           title=get_title(thread_id))
+                           title=get_title(thread_id), max_length=MAX_LENGTH,
+                           thread_id=thread_id)
+
+
+@app.route('/threads/<int:thread_id>', methods=['POST'])
+def post_to_thread(thread_id):
+    name = request.form['name']
+    email = request.form['email']
+    text = request.form['text']
+    try:
+        validate_post(name, email, text)
+        check_thread_exists(thread_id)
+    except ValidationError:
+        return redirect(url_for('show_thread', thread_id=thread_id))
+    except ThreadDoesNotExist:
+        abort(400)
+    else:
+        try:
+            with conn:
+                create_post(thread_id, name, email, text)
+                return redirect(url_for('show_thread', thread_id=thread_id))
+        except sqlite3.IntegrityError:
+            return redirect(url_for('show_thread', thread_id=thread_id))
 
 
 if __name__ == '__main__':
