@@ -85,6 +85,20 @@ def list_threads():
     return threads
 
 
+def search_thread(query):
+    posts_raw = conn.execute('SELECT * FROM posts WHERE text LIKE ? '
+                             'ORDER BY created_at DESC', ('%'+query+'%',)).fetchall()
+    ids = list({str(x['thread_id']) for x in posts_raw})
+    threads = [dict(x) for x in conn.execute(
+        'SELECT * FROM threads WHERE id IN ({})'
+        'ORDER BY created_at DESC'.format(','.join('?' * len(ids))), ids)]
+    posts_groupby = groupby(posts_raw, key=lambda x: x['thread_id'])
+    posts = {k: list(v) for k, v in posts_groupby}
+    for i, thread in enumerate(threads):
+        threads[i]['posts'] = list(posts[thread['id']])
+    return threads
+
+
 def get_posts(thread_id):
     return conn.execute('SELECT * FROM posts WHERE thread_id = ? '
                         'ORDER BY created_at ASC', (thread_id,)).fetchall()
@@ -159,6 +173,14 @@ def post_to_thread(thread_id):
                 return redirect(url_for('show_thread', thread_id=thread_id))
         except sqlite3.IntegrityError:
             return redirect(url_for('show_thread', thread_id=thread_id))
+
+
+@app.route('/search')
+def search_bbs():
+    query = request.args['q']
+    if not query:
+        return redirect(url_for('index'))
+    return render_template('search.html', query=query, threads=search_thread(query))
 
 
 if __name__ == '__main__':
