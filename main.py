@@ -6,6 +6,7 @@ from hashlib import sha1
 from base64 import b64encode
 from datetime import datetime
 from itertools import groupby
+from nkf import nkf
 from flask import Flask, request, render_template, redirect, url_for, abort
 from dotenv import load_dotenv, find_dotenv
 app = Flask(__name__)
@@ -105,6 +106,7 @@ def update_thread_timestamp(thread_id):
 
 
 def generate_trip(tripstr: str) -> str:
+    tripstr = nkf('s', tripstr).decode('shiftjis')
     if len(tripstr) >= 12:
         mark = tripstr[0]
         if mark == '#' or mark == '$':
@@ -115,7 +117,7 @@ def generate_trip(tripstr: str) -> str:
                 trip = '???'
         else:
             m = sha1()
-            m.update(tripstr.encode('utf-8'))
+            m.update(tripstr)
             trip = str(b64encode(m.hexdigest))[:12]
             trip = trip.replace('+', '.')
     else:
@@ -123,7 +125,7 @@ def generate_trip(tripstr: str) -> str:
         salt = (tripkey + "H.")[1:3]
         salt = re.sub(r'[^\.-z]', '.', salt)
         salt = salt.translate(str.maketrans(':;<=>?@[\\]^_`', 'ABCDEFGabcdef'))
-        trip = crypt(tripkey.encode('utf-8').decode('cp932'), salt)
+        trip = crypt(tripkey, salt)
         trip = trip[-10:]
     trip = '◆' + trip
     return trip
