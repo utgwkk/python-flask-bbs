@@ -106,9 +106,9 @@ def update_thread_timestamp(thread_id):
 
 
 def generate_trip(tripstr: str) -> str:
-    tripstr = nkf('s', tripstr).decode('shiftjis')
-    if len(tripstr) >= 12:
-        mark = tripstr[0]
+    tripkey = nkf('s', tripstr)
+    if len(tripkey) >= 12:
+        mark = tripkey[0]
         if mark == '#' or mark == '$':
             m = re.match(r'^#([0-9a-fA-F]{16})([\./0-9A-Za-z]{0,2})$', tripstr)
             if m:
@@ -117,8 +117,8 @@ def generate_trip(tripstr: str) -> str:
                 trip = '???'
         else:
             m = sha1()
-            m.update(tripstr)
-            trip = str(b64encode(m.hexdigest))[:12]
+            m.update(tripkey)
+            trip = str(b64encode(m.digest()))[:12]
             trip = trip.replace('+', '.')
     else:
         tripkey = tripstr[1:]
