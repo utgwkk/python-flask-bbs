@@ -8,8 +8,7 @@ A Python (Flask) implementation of BBS (Bulletin Board System)
 ## Usage
 
 ```sh
-$ pip install -r requirements.txt
-$ python main.py
+$ pipenv run python python main.py
 ```
 
 then access http://localhost:8080/
@@ -17,5 +16,5 @@ then access http://localhost:8080/
 If you want to use a different port number then
 
 ```sh
-$ BBS_PORT=<port_number> python main.py
+$ BBS_PORT=<port_number> pipenv run python main.py
 ```
